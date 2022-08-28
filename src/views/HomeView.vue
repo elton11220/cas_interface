@@ -20,6 +20,13 @@
               <n-input
                 placeholder="请输入用户名"
                 v-model:value="loginForm.username"
+                :status="loginFormValidate.username ? 'error' : ''"
+                :on-input="
+                  () => {
+                    loginFormValidate.username = false;
+                  }
+                "
+                :maxlength="20"
               >
                 <template v-slot:prefix>
                   <n-icon color="#333639">
@@ -34,6 +41,13 @@
                 type="password"
                 v-model:value="loginForm.password"
                 show-password-on="mousedown"
+                :maxlength="25"
+                :status="loginFormValidate.password ? 'error' : ''"
+                :on-input="
+                  () => {
+                    loginFormValidate.password = false;
+                  }
+                "
               >
                 <template v-slot:prefix>
                   <n-icon color="#333639">
@@ -51,7 +65,13 @@
             />
             <n-button text type="primary">找回密码</n-button>
           </div>
-          <n-button type="primary" block @click="validateForm">登 录</n-button>
+          <n-button
+            type="primary"
+            block
+            @click="submitLoginForm"
+            :loading="loginFormSubmitLoading"
+            >登 录</n-button
+          >
           <div class="others">
             <div>其他登录方式</div>
             <n-icon size="0.1458rem">
@@ -74,6 +94,8 @@ import {
 } from "@vicons/ionicons5";
 import { ref } from "vue";
 
+const message = useMessage();
+
 interface LoginFormType {
   username: string;
   password: string;
@@ -86,9 +108,31 @@ const loginForm = ref<LoginFormType>({
   autoLogin: true,
 });
 
-const validateForm = () => {
-  console.log(loginForm.value);
+const loginFormValidate = ref({
+  username: false,
+  password: false,
+});
+
+const validateLoginForm = () => {
+  const { username, password } = loginForm.value;
+  if (username === "" || password === "") {
+    loginFormValidate.value.username = username === "";
+    loginFormValidate.value.password = password === "";
+    message.error("用户名或密码不能为空");
+    return false;
+  }
+  return true;
 };
+
+const submitLoginForm = () => {
+  if (validateLoginForm()) {
+    loginFormSubmitLoading.value = true;
+    console.log("submitting");
+    console.log(loginForm.value)
+  }
+};
+
+const loginFormSubmitLoading = ref<boolean>(false);
 </script>
 
 <style scoped lang="scss">
