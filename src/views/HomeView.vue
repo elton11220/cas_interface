@@ -15,7 +15,7 @@
         tab-style="font-size: 0.00729rem;"
       >
         <n-tab-pane name="login" tab="账号密码登录">
-          <div class="formItems">
+          <div class="formItems px-3">
             <div class="formItem">
               <n-input
                 placeholder="请输入用户名"
@@ -57,7 +57,7 @@
               </n-input>
             </div>
           </div>
-          <div class="options">
+          <div class="options px-3">
             <n-checkbox
               size="small"
               label="自动登录"
@@ -65,13 +65,15 @@
             />
             <n-button text type="primary">找回密码</n-button>
           </div>
-          <n-button
+          <div class="px-3">
+            <n-button
             type="primary"
             block
             @click="submitLoginForm"
             :loading="loginFormSubmitLoading"
             >登 录</n-button
           >
+          </div>
           <div class="others">
             <div>其他登录方式</div>
             <n-icon size="0.1458rem">
@@ -145,6 +147,11 @@ const loginFormSubmitLoading = ref<boolean>(false);
   position: relative;
   color: #333639;
   font-family: "Microsoft YaHei", Helvetica, "PingFang SC";
+}
+
+.px-3 {
+  padding-left: 3px !important;
+  padding-right: 3px !important;
 }
 
 .formWrapper {
