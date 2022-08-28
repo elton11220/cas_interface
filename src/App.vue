@@ -7,7 +7,9 @@
       <h1>内网统一认证</h1>
       <span>Central Authentication Service</span>
     </div>
-    <router-view />
+    <n-message-provider>
+      <router-view />
+    </n-message-provider>
   </div>
 </template>
 
