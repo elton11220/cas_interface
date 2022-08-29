@@ -67,12 +67,12 @@
           </div>
           <div class="px-3">
             <n-button
-            type="primary"
-            block
-            @click="submitLoginForm"
-            :loading="loginFormSubmitLoading"
-            >登 录</n-button
-          >
+              type="primary"
+              block
+              @click="submitLoginForm"
+              :loading="loginFormSubmitLoading"
+              >登 录</n-button
+            >
           </div>
           <div class="others">
             <div>其他登录方式</div>
@@ -81,7 +81,72 @@
             </n-icon>
           </div>
         </n-tab-pane>
-        <n-tab-pane name="loginByPhone" tab="手机号登录"> </n-tab-pane>
+        <n-tab-pane name="loginByPhone" tab="手机号登录">
+          <div class="formItems px-3">
+            <div class="formItem">
+              <n-input
+                placeholder="请输入手机号"
+                v-model:value="loginByPhoneForm.phone"
+                :status="loginByPhoneFormValidate.phone ? 'error' : ''"
+                :on-input="
+                  () => {
+                    loginByPhoneFormValidate.phone = false;
+                  }
+                "
+                :maxlength="11"
+              >
+                <template v-slot:prefix>
+                  <n-icon color="#333639">
+                    <PhonePortraitOutline />
+                  </n-icon>
+                </template>
+              </n-input>
+            </div>
+            <div class="formItem">
+              <n-input
+                placeholder="请输入验证码"
+                v-model:value="loginByPhoneForm.code"
+                :maxlength="6"
+                :status="loginByPhoneFormValidate.code ? 'error' : ''"
+                :on-input="
+                  () => {
+                    loginByPhoneFormValidate.code = false;
+                  }
+                "
+              >
+                <template v-slot:prefix>
+                  <n-icon color="#333639">
+                    <KeypadOutline />
+                  </n-icon>
+                </template>
+              </n-input>
+              <n-button>获取验证码</n-button>
+            </div>
+          </div>
+          <div class="options px-3">
+            <n-checkbox
+              size="small"
+              label="自动登录"
+              v-model:checked="loginByPhoneForm.autoLogin"
+            />
+            <n-button text type="primary">找回密码</n-button>
+          </div>
+          <div class="px-3">
+            <n-button
+              type="primary"
+              block
+              @click="submitLoginByPhoneForm"
+              :loading="loginByPhoneFormSubmitLoading"
+              >登 录</n-button
+            >
+          </div>
+          <div class="others">
+            <div>其他登录方式</div>
+            <n-icon size="0.1458rem">
+              <LogoGithub />
+            </n-icon>
+          </div>
+        </n-tab-pane>
       </n-tabs>
     </div>
   </div>
@@ -93,6 +158,8 @@ import {
   PersonOutline,
   LockClosedOutline,
   LogoGithub,
+  PhonePortraitOutline,
+  KeypadOutline,
 } from "@vicons/ionicons5";
 import { ref } from "vue";
 
@@ -130,11 +197,61 @@ const submitLoginForm = () => {
   if (validateLoginForm()) {
     loginFormSubmitLoading.value = true;
     console.log("submitting");
-    console.log(loginForm.value)
+    console.log(loginForm.value);
   }
 };
 
 const loginFormSubmitLoading = ref<boolean>(false);
+
+// loginByPhone
+
+interface LoginByPhoneFormType {
+  phone: string;
+  code: string;
+  autoLogin: boolean;
+}
+
+const loginByPhoneForm = ref<LoginByPhoneFormType>({
+  phone: "",
+  code: "",
+  autoLogin: true,
+});
+
+const loginByPhoneFormValidate = ref({
+  phone: false,
+  code: false,
+});
+
+const validateLoginByPhoneForm = () => {
+  const { phone, code } = loginByPhoneForm.value;
+  if (phone === "" || code === "") {
+    loginByPhoneFormValidate.value.phone = phone === "";
+    loginByPhoneFormValidate.value.code = code === "";
+    message.error("手机号或验证码不能为空");
+    return false;
+  }
+  if (/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(phone) === false) {
+    loginByPhoneFormValidate.value.phone = true;
+    message.error("手机号格式错误");
+    return false;
+  }
+  if (/^[0-9]{6}$/.test(code) === false) {
+    loginByPhoneFormValidate.value.code = true;
+    message.error("验证码只能为6位数字");
+    return false;
+  }
+  return true;
+};
+
+const submitLoginByPhoneForm = () => {
+  if (validateLoginByPhoneForm()) {
+    loginByPhoneFormSubmitLoading.value = true;
+    console.log("submitting");
+    console.log(loginByPhoneForm.value);
+  }
+};
+
+const loginByPhoneFormSubmitLoading = ref<boolean>(false);
 </script>
 
 <style scoped lang="scss">
