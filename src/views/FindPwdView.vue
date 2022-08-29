@@ -48,7 +48,7 @@
           </n-input>
           <n-button @click="getMsgCode">获取验证码</n-button>
         </div>
-        <div class="formItem">
+        <div class="formItem flex-col gap-15">
           <n-input
             placeholder="请输入新密码"
             type="password"
@@ -68,6 +68,7 @@
               </n-icon>
             </template>
           </n-input>
+          <PwdStrength :value="newPwdComplexity" />
         </div>
       </div>
       <div class="tip">*仅支持已绑定手机号的账户找回密码</div>
@@ -91,7 +92,8 @@ import {
   KeypadOutline,
   KeyOutline,
 } from "@vicons/ionicons5";
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import PwdStrength from "../components/PwdStrength.vue";
 
 const message = useMessage();
 
@@ -118,12 +120,36 @@ const validatePhoneNumber = (phone: string) =>
     phone
   );
 
+const computeNewPwdComplexity = (password: string) => {
+  let level = 0;
+  // 6-18位，包括至少1个大写字母，1个小写字母，1个数字
+  const level2RegExp = new RegExp(
+    /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{6,25}/
+  );
+  // 包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符，特殊字符只能是!@$%^*?~
+  const level3RegExp = new RegExp(
+    /^(?=.*\d)(?=.*[A-Za-z])(?=.*[!@$%^*?~])[\u4E00-\u9FA5A-Za-z0-9!@$%^*?~]{8,25}/
+  );
+  if (level2RegExp.test(password)) {
+    level++;
+  }
+  if (level3RegExp.test(password)) {
+    level++;
+  }
+  return level;
+};
+
+const newPwdComplexity = computed(() =>
+  computeNewPwdComplexity(findPwdForm.value.newPwd)
+);
+
 const validateFindPwdForm = () => {
-  const { phone, code } = findPwdForm.value;
-  if (phone === "" || code === "") {
+  const { phone, code, newPwd } = findPwdForm.value;
+  if (phone === "" || code === "" || newPwd === "") {
     findPwdFormValidate.value.phone = phone === "";
     findPwdFormValidate.value.code = code === "";
-    message.error("手机号或验证码不能为空");
+    findPwdFormValidate.value.newPwd = newPwd === "";
+    message.error("手机号、验证码或新密码不能为空");
     return false;
   }
   if (validatePhoneNumber(phone) === false) {
@@ -136,6 +162,12 @@ const validateFindPwdForm = () => {
     message.error("验证码只能为6位数字");
     return false;
   }
+  if (newPwdComplexity.value < 1) {
+    findPwdFormValidate.value.newPwd = true;
+    message.info("新密码推荐使用8-25位大写字母、小写字母、数字、特殊字符!@$%^*?~");
+    message.error("禁止使用弱密码");
+    return false;
+  }
   return true;
 };
 
@@ -146,8 +178,8 @@ const getMsgCode = () => {
     message.error("手机号格式错误");
     return;
   }
-  console.log("getMsgCode")
-}
+  console.log("getMsgCode");
+};
 
 const submitFindPwdForm = () => {
   if (validateFindPwdForm()) {
@@ -184,6 +216,10 @@ const findPwdFormSubmitLoading = ref<boolean>(false);
 .px-3 {
   padding-left: 3px !important;
   padding-right: 3px !important;
+}
+
+.gap-15 {
+  gap: 15px !important;
 }
 
 .formWrapper {
