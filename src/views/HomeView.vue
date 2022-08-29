@@ -12,7 +12,6 @@
         type="line"
         animated
         justify-content="space-evenly"
-        tab-style="font-size: 0.00729rem;"
       >
         <n-tab-pane name="login" tab="账号密码登录">
           <div class="formItems px-3">
@@ -76,7 +75,7 @@
           </div>
           <div class="others">
             <div>其他登录方式</div>
-            <n-icon size="0.1458rem">
+            <n-icon size="28">
               <LogoGithub />
             </n-icon>
           </div>
@@ -142,7 +141,7 @@
           </div>
           <div class="others">
             <div>其他登录方式</div>
-            <n-icon size="0.1458rem">
+            <n-icon size="28">
               <LogoGithub />
             </n-icon>
           </div>

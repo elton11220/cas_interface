@@ -37,6 +37,7 @@ import naiveLogoImg from "@/assets/naiveLogo.svg";
   display: flex;
   align-items: center;
   gap: 15px;
+  background-color: #fff;
   > .icon {
     height: 40px;
     width: 40px;
