@@ -119,7 +119,7 @@
                   </n-icon>
                 </template>
               </n-input>
-              <n-button>获取验证码</n-button>
+              <n-button @click="getMsgCode">获取验证码</n-button>
             </div>
           </div>
           <div class="options px-3">
@@ -221,6 +221,8 @@ const loginByPhoneFormValidate = ref({
   code: false,
 });
 
+const validatePhoneNumber = (phone: string) => /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(phone)
+
 const validateLoginByPhoneForm = () => {
   const { phone, code } = loginByPhoneForm.value;
   if (phone === "" || code === "") {
@@ -229,7 +231,7 @@ const validateLoginByPhoneForm = () => {
     message.error("手机号或验证码不能为空");
     return false;
   }
-  if (/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(phone) === false) {
+  if (validatePhoneNumber(phone) === false) {
     loginByPhoneFormValidate.value.phone = true;
     message.error("手机号格式错误");
     return false;
@@ -241,6 +243,16 @@ const validateLoginByPhoneForm = () => {
   }
   return true;
 };
+
+const getMsgCode = () => {
+  const { phone } = loginByPhoneForm.value;
+  if (validatePhoneNumber(phone) === false) {
+    loginByPhoneFormValidate.value.phone = true;
+    message.error("手机号格式错误");
+    return;
+  }
+  console.log("getMsgCode")
+}
 
 const submitLoginByPhoneForm = () => {
   if (validateLoginByPhoneForm()) {
