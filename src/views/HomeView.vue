@@ -62,7 +62,7 @@
               label="自动登录"
               v-model:checked="loginForm.autoLogin"
             />
-            <n-button text type="primary">找回密码</n-button>
+            <router-link class="link" to="forgetPassword">找回密码</router-link>
           </div>
           <div class="px-3">
             <n-button
@@ -128,7 +128,7 @@
               label="自动登录"
               v-model:checked="loginByPhoneForm.autoLogin"
             />
-            <n-button text type="primary">找回密码</n-button>
+            <router-link class="link" to="forgetPassword">找回密码</router-link>
           </div>
           <div class="px-3">
             <n-button
@@ -263,6 +263,11 @@ const loginByPhoneFormSubmitLoading = ref<boolean>(false);
   position: relative;
   color: #333639;
   font-family: "Microsoft YaHei", Helvetica, "PingFang SC";
+}
+
+.link {
+  color: #36ad6a;
+  text-decoration: none;
 }
 
 .px-3 {

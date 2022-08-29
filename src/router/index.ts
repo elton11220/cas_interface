@@ -7,6 +7,11 @@ const routes: RouteRecordRaw[] = [
     name: "home",
     component: HomeView,
   },
+  {
+    path: "/forgetPassword",
+    name: "forgetPassword",
+    component: () => import("../views/FindPwdView.vue"),
+  }
 ];
 
 const router = createRouter({
