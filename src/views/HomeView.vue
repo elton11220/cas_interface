@@ -71,7 +71,7 @@
           </div>
           <div class="others">
             <div>其他登录方式</div>
-            <n-icon size="28">
+            <n-icon size="28" @click="loginByGithub" style="cursor: pointer;">
               <LogoGithub />
             </n-icon>
           </div>
@@ -137,7 +137,7 @@
           </div>
           <div class="others">
             <div>其他登录方式</div>
-            <n-icon size="28">
+            <n-icon size="28" @click="loginByGithub" style="cursor: pointer;">
               <LogoGithub />
             </n-icon>
           </div>
@@ -161,6 +161,16 @@ import request from "@/utils/request";
 
 const message = useMessage();
 window.$message = useMessage();
+
+// github OAuth
+const loginByGithub = () => {
+  const githubOptions = {
+    clientId: "459ae6faf422ca9ac168",
+    redirectUri: "http://localhost:5173/callback",
+  };
+  window.location.href = `https://github.com/login/oauth/authorize?client_id=${githubOptions.clientId}&redirect_uri=${githubOptions.redirectUri}`;
+};
+//
 
 interface LoginFormType {
   username: string;
@@ -195,7 +205,7 @@ const submitLoginForm = async () => {
     loginFormSubmitLoading.value = true;
     localStorage.setItem("autoLogin", `${loginForm.value.autoLogin}`);
     await request({
-      url: '/auth/getTgc',
+      url: "/auth/getTgc",
       method: "POST",
       data: {
         username: loginForm.value.username,
