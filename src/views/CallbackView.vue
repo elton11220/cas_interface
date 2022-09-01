@@ -6,7 +6,7 @@
           <n-spin size="small">
             <template #description>
               <div class="tip">
-                重定向中……
+                第三方登录中
               </div>
             </template>
           </n-spin>
