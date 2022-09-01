@@ -7,6 +7,13 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     name: "home",
     component: HomeView,
+    beforeEnter: (to, from, next) => {
+      const { query } = to;
+      if (query?.redirect) {
+        window.localStorage.setItem('redirect', query.redirect as string)
+      }
+      next()
+    }
   },
   {
     path: "/forgetPassword",

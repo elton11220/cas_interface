@@ -5,9 +5,7 @@
         <div class="formItem justify-center">
           <n-spin size="small">
             <template #description>
-              <div class="tip">
-                第三方登录中
-              </div>
+              <div class="tip">第三方登录中</div>
             </template>
           </n-spin>
         </div>
@@ -17,8 +15,57 @@
 </template>
 
 <script setup lang="ts">
+import request from "@/utils/request";
+import { useRoute, useRouter } from "vue-router";
+import { onMounted } from "vue";
+
 const message = useMessage();
 window.$message = useMessage();
+
+const route = useRoute();
+const router = useRouter();
+
+interface TgcResult {
+  tgc: string;
+  maxAge: string;
+}
+
+onMounted(async () => {
+  const {
+    query: { code },
+  } = route;
+  try {
+    const { data: tgcResult } = await request<TgcResult>({
+      url: "/auth/getTgcByOauth",
+      method: "POST",
+      data: {
+        provider: "github",
+        code,
+      },
+      withCredentials: false,
+    });
+    if (tgcResult?.tgc == null) {
+      message.error("返回值异常");
+      throw new Error();
+    }
+    let redirect = window.localStorage.getItem("redirect");
+    if (redirect !== null) {
+      const uri = router.resolve({
+        path: redirect,
+        query: {
+          tgc: tgcResult?.tgc,
+        },
+      });
+      window.localStorage.removeItem("redirect");
+      window.location.href = uri.fullPath.replace(/^\//, "");
+    } else {
+      message.success("登录成功");
+      router.push("/");
+    }
+  } catch (e) {
+    router.push("/");
+  }
+});
 </script>
 
 <style scoped lang="scss">
