@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
     } else if (code === 400 || code === 403) {
       window.$message.error(message);
     }
-    return res.data;
+    return res;
   },
   (error: AxiosError<ErrResult>) => {
     return Promise.reject(error);
