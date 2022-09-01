@@ -24,15 +24,12 @@ axiosInstance.interceptors.response.use(
     const message = res.data.msg;
     if (code === 200 || code === 201) {
       window.$message.success(message);
+    } else if (code === 400 || code === 403) {
+      window.$message.error(message);
     }
     return res.data;
   },
   (error: AxiosError<ErrResult>) => {
-    const code = error.response?.status || 400;
-    const message = error.response?.data.msg || error.message || '请求失败';
-    if (code === 400 || code === 403) {
-      window.$message.error(message);
-    }
     return Promise.reject(error);
   }
 );
