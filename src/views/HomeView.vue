@@ -8,11 +8,7 @@
         <div class="appName">App Name</div>
       </div>
       <div class="subTitle">内网统一认证服务</div>
-      <n-tabs
-        type="line"
-        animated
-        justify-content="space-evenly"
-      >
+      <n-tabs type="line" animated justify-content="space-evenly">
         <n-tab-pane name="login" tab="账号密码登录">
           <div class="formItems px-3">
             <div class="formItem">
@@ -161,8 +157,10 @@ import {
   KeypadOutline,
 } from "@vicons/ionicons5";
 import { ref } from "vue";
+import request from "@/utils/request";
 
 const message = useMessage();
+window.$message = useMessage();
 
 interface LoginFormType {
   username: string;
@@ -192,11 +190,21 @@ const validateLoginForm = () => {
   return true;
 };
 
-const submitLoginForm = () => {
+const submitLoginForm = async () => {
   if (validateLoginForm()) {
     loginFormSubmitLoading.value = true;
-    console.log("submitting");
-    console.log(loginForm.value);
+    localStorage.setItem("autoLogin", `${loginForm.value.autoLogin}`);
+    await request({
+      url: '/auth/getTgc',
+      method: "POST",
+      data: {
+        username: loginForm.value.username,
+        password: loginForm.value.password,
+      },
+      withCredentials: false,
+    });
+    loginFormSubmitLoading.value = false;
+    //
   }
 };
 
@@ -221,7 +229,10 @@ const loginByPhoneFormValidate = ref({
   code: false,
 });
 
-const validatePhoneNumber = (phone: string) => /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(phone)
+const validatePhoneNumber = (phone: string) =>
+  /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(
+    phone
+  );
 
 const validateLoginByPhoneForm = () => {
   const { phone, code } = loginByPhoneForm.value;
@@ -251,8 +262,8 @@ const getMsgCode = () => {
     message.error("手机号格式错误");
     return;
   }
-  console.log("getMsgCode")
-}
+  console.log("getMsgCode");
+};
 
 const submitLoginByPhoneForm = () => {
   if (validateLoginByPhoneForm()) {
