@@ -71,7 +71,7 @@
           </div>
           <div class="others">
             <div>其他登录方式</div>
-            <n-icon size="28" @click="loginByGithub" style="cursor: pointer;">
+            <n-icon size="28" @click="loginByGithub" style="cursor: pointer">
               <LogoGithub />
             </n-icon>
           </div>
@@ -137,7 +137,7 @@
           </div>
           <div class="others">
             <div>其他登录方式</div>
-            <n-icon size="28" @click="loginByGithub" style="cursor: pointer;">
+            <n-icon size="28" @click="loginByGithub" style="cursor: pointer">
               <LogoGithub />
             </n-icon>
           </div>
@@ -158,9 +158,12 @@ import {
 } from "@vicons/ionicons5";
 import { ref } from "vue";
 import request from "@/utils/request";
+import { useRouter } from "vue-router";
 
 const message = useMessage();
 window.$message = useMessage();
+
+const router = useRouter();
 
 // github OAuth
 const loginByGithub = () => {
@@ -176,6 +179,11 @@ interface LoginFormType {
   username: string;
   password: string;
   autoLogin: boolean;
+}
+
+interface TgcResult {
+  tgc: string;
+  maxAge: string;
 }
 
 const loginForm = ref<LoginFormType>({
@@ -204,7 +212,7 @@ const submitLoginForm = async () => {
   if (validateLoginForm()) {
     loginFormSubmitLoading.value = true;
     localStorage.setItem("autoLogin", `${loginForm.value.autoLogin}`);
-    await request({
+    const { data: tgcResult } = await request<TgcResult>({
       url: "/auth/getTgc",
       method: "POST",
       data: {
@@ -213,8 +221,23 @@ const submitLoginForm = async () => {
       },
       withCredentials: false,
     });
+    if (tgcResult?.tgc == null) {
+      throw new Error();
+    }
+    let redirect = window.localStorage.getItem("redirect");
+    if (redirect !== null) {
+      const uri = router.resolve({
+        path: redirect,
+        query: {
+          tgc: tgcResult?.tgc,
+        },
+      });
+      window.localStorage.removeItem("redirect");
+      window.location.href = uri.fullPath.replace(/^\//, "");
+    } else {
+      router.push("/noRedirectUrl");
+    }
     loginFormSubmitLoading.value = false;
-    //
   }
 };
 
