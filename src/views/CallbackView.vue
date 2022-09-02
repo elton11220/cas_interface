@@ -58,8 +58,7 @@ onMounted(async () => {
       window.localStorage.removeItem("redirect");
       window.location.href = uri.fullPath.replace(/^\//, "");
     } else {
-      message.success("登录成功");
-      router.push("/");
+      router.push("/noRedirectUrl");
     }
   } catch (e) {
     router.push("/");
