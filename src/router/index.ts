@@ -32,6 +32,11 @@ const routes: RouteRecordRaw[] = [
         next()
       }
     }
+  },
+  {
+    path: '/noRedirectUrl',
+    name: 'noRedirectUrl',
+    component: () => import("../views/NoRedirectUrlView.vue"),
   }
 ];
 
