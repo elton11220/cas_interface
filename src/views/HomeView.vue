@@ -52,15 +52,7 @@
               </n-input>
             </div>
           </div>
-          <div class="options px-3">
-            <n-checkbox
-              size="small"
-              label="自动登录"
-              v-model:checked="loginForm.autoLogin"
-            />
-            <router-link class="link" to="forgetPassword">找回密码</router-link>
-          </div>
-          <div class="px-3">
+          <div class="px-3 mt-30">
             <n-button
               type="primary"
               block
@@ -68,6 +60,9 @@
               :loading="loginFormSubmitLoading"
               >登 录</n-button
             >
+          </div>
+          <div class="options px-3">
+            <router-link class="link" to="forgetPassword">已有账号，忘记密码？</router-link>
           </div>
           <div class="others">
             <div>其他登录方式</div>
@@ -118,15 +113,7 @@
               <n-button @click="getMsgCode">获取验证码</n-button>
             </div>
           </div>
-          <div class="options px-3">
-            <n-checkbox
-              size="small"
-              label="自动登录"
-              v-model:checked="loginByPhoneForm.autoLogin"
-            />
-            <router-link class="link" to="forgetPassword">找回密码</router-link>
-          </div>
-          <div class="px-3">
+          <div class="px-3 mt-30">
             <n-button
               type="primary"
               block
@@ -134,6 +121,9 @@
               :loading="loginByPhoneFormSubmitLoading"
               >登 录</n-button
             >
+          </div>
+          <div class="options px-3">
+            <router-link class="link" to="forgetPassword">已有账号，忘记密码？</router-link>
           </div>
           <div class="others">
             <div>其他登录方式</div>
@@ -178,7 +168,6 @@ const loginByGithub = () => {
 interface LoginFormType {
   username: string;
   password: string;
-  autoLogin: boolean;
 }
 
 interface TgcResult {
@@ -189,7 +178,6 @@ interface TgcResult {
 const loginForm = ref<LoginFormType>({
   username: "",
   password: "",
-  autoLogin: true,
 });
 
 const loginFormValidate = ref({
@@ -211,7 +199,6 @@ const validateLoginForm = () => {
 const submitLoginForm = async () => {
   if (validateLoginForm()) {
     loginFormSubmitLoading.value = true;
-    localStorage.setItem("autoLogin", `${loginForm.value.autoLogin}`);
     const { data: tgcResult } = await request<TgcResult>({
       url: "/auth/getTgc",
       method: "POST",
@@ -251,13 +238,11 @@ const loginFormSubmitLoading = ref<boolean>(false);
 interface LoginByPhoneFormType {
   phone: string;
   code: string;
-  autoLogin: boolean;
 }
 
 const loginByPhoneForm = ref<LoginByPhoneFormType>({
   phone: "",
   code: "",
-  autoLogin: true,
 });
 
 const loginByPhoneFormValidate = ref({
@@ -329,6 +314,10 @@ const loginByPhoneFormSubmitLoading = ref<boolean>(false);
   text-decoration: none;
 }
 
+.mt-30 {
+  margin-top: 30px;
+}
+
 .px-3 {
   padding-left: 3px !important;
   padding-right: 3px !important;
@@ -386,9 +375,9 @@ const loginByPhoneFormSubmitLoading = ref<boolean>(false);
     }
   }
   .options {
-    padding: 30px 0;
+    padding-top: 15px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
   }
   .others {
