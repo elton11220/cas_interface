@@ -63,7 +63,18 @@ const routes: RouteRecordRaw[] = [
     name: 'redirect',
     component: RedirectView,
     beforeEnter: (to, from, next) => {
-      next()
+      const expiryTime = window.localStorage.getItem("authorized");
+      if (
+        window.localStorage.getItem("redirect") !== null &&
+        expiryTime !== null &&
+        Number(expiryTime).toString() !== "NaN" &&
+        new Date().getTime() < Number.parseInt(expiryTime)
+      ) {
+        next()
+      } else {
+        // 用户直接访问本路径，不存在登录记录和重定向信息
+        next('/')
+      }
     }
   }
 ];
