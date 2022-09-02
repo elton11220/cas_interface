@@ -222,6 +222,7 @@ const submitLoginForm = async () => {
       withCredentials: false,
     });
     if (tgcResult?.tgc == null) {
+      loginFormSubmitLoading.value = false;
       throw new Error();
     }
     let redirect = window.localStorage.getItem("redirect");
