@@ -45,7 +45,6 @@ onMounted(async () => {
       withCredentials: false,
     });
     if (tgcResult?.tgc == null) {
-      message.error("返回值异常");
       throw new Error();
     }
     let redirect = window.localStorage.getItem("redirect");

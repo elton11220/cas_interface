@@ -30,6 +30,7 @@ axiosInstance.interceptors.response.use(
     return res;
   },
   (error: AxiosError<ErrResult>) => {
+    window.$message.error("请求失败");
     return Promise.reject(error);
   }
 );
