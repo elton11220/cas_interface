@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import CallbackView from "../views/CallbackView.vue";
+import RedirectView from "../views/RedirectView.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -12,7 +13,26 @@ const routes: RouteRecordRaw[] = [
       if (query?.redirect) {
         window.localStorage.setItem('redirect', query.redirect as string)
       }
-      next()
+      const expiryTime = window.localStorage.getItem("authorized");
+      if (
+        window.localStorage.getItem("redirect") === null &&
+        expiryTime !== null &&
+        Number(expiryTime).toString() !== "NaN" &&
+        new Date().getTime() < Number.parseInt(expiryTime)
+      ) {
+        // 用户已登录且不存在重定向URL
+        next('/noRedirectUrl')
+      } else if (
+        window.localStorage.getItem("redirect") !== null &&
+        expiryTime !== null &&
+        Number(expiryTime).toString() !== "NaN" &&
+        new Date().getTime() < Number.parseInt(expiryTime)
+      ) {
+        // 用户已登录且存在重定向URL
+        next('/redirect')
+      } else {
+        next()
+      }
     }
   },
   {
@@ -37,6 +57,14 @@ const routes: RouteRecordRaw[] = [
     path: '/noRedirectUrl',
     name: 'noRedirectUrl',
     component: () => import("../views/NoRedirectUrlView.vue"),
+  },
+  {
+    path: '/redirect',
+    name: 'redirect',
+    component: RedirectView,
+    beforeEnter: (to, from, next) => {
+      next()
+    }
   }
 ];
 

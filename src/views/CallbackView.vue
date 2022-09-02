@@ -48,6 +48,8 @@ onMounted(async () => {
       throw new Error();
     }
     let redirect = window.localStorage.getItem("redirect");
+    const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge)
+    window.localStorage.setItem("authorized", expiryTime.toString()); // 设置已登录状态
     if (redirect !== null) {
       const uri = router.resolve({
         path: redirect,
