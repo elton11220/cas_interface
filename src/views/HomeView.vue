@@ -453,11 +453,38 @@ const getEmailCode = async () => {
   getEmailBtnState.loading = false;
 };
 
-const submitLoginByEmailForm = () => {
+const submitLoginByEmailForm = async () => {
   if (validateLoginByEmailForm()) {
     loginByEmailFormSubmitLoading.value = true;
-    console.log("submitting");
-    console.log(loginByEmailForm.value);
+    const { data: tgcResult } = await request<TgcResult>({
+      url: "/auth/getTgcByEmail",
+      method: "POST",
+      data: {
+        email: loginByEmailForm.value.email,
+        code: loginByEmailForm.value.code,
+      },
+      withCredentials: true,
+    });
+    if (tgcResult?.tgc == null) {
+      loginByEmailFormSubmitLoading.value = false;
+      throw new Error();
+    }
+    let redirect = window.localStorage.getItem("redirect");
+    const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge);
+    window.localStorage.setItem("authorized", expiryTime.toString()); // 设置已登录状态
+    if (redirect !== null) {
+      const uri = router.resolve({
+        path: redirect,
+        query: {
+          tgc: tgcResult?.tgc,
+        },
+      });
+      window.localStorage.removeItem("redirect");
+      window.location.href = uri.fullPath.replace(/^\//, "");
+    } else {
+      router.push("/noRedirectUrl");
+    }
+    loginByEmailFormSubmitLoading.value = false;
   }
 };
 
