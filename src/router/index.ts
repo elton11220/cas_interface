@@ -57,6 +57,18 @@ const routes: RouteRecordRaw[] = [
     path: '/noRedirectUrl',
     name: 'noRedirectUrl',
     component: () => import("../views/NoRedirectUrlView.vue"),
+    beforeEnter: (to, from, next) => {
+      const expiryTime = window.localStorage.getItem("authorized");
+      if (
+        expiryTime === null ||
+        Number(expiryTime).toString() === "NaN" ||
+        new Date().getTime() >= Number.parseInt(expiryTime)
+      ) {
+        next('/');
+      } else {
+        next();
+      }
+    }
   },
   {
     path: '/redirect',

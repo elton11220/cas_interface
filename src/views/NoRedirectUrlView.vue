@@ -19,13 +19,43 @@
 </template>
 
 <script setup lang="ts">
-  const message = useMessage();
-  const bonusClick = () => {
-    message.success("这是个彩蛋🍉")
-    message.warning("这是个彩蛋😋")
-    message.error("只是个彩蛋🍖")
-    message.info("真的只是个彩蛋🍟")
+import request from "@/utils/request";
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const message = useMessage();
+window.$message = useMessage();
+const bonusClick = () => {
+  message.success("这是个彩蛋🍉");
+  message.warning("这是个彩蛋😋");
+  message.error("只是个彩蛋🍖");
+  message.info("真的只是个彩蛋🍟");
+};
+
+onMounted(() => {
+  const expiryTime = window.localStorage.getItem("authorized");
+  if (
+    window.localStorage.getItem("redirect") === null &&
+    expiryTime !== null &&
+    Number(expiryTime).toString() !== "NaN" &&
+    new Date().getTime() < Number.parseInt(expiryTime)
+  ) {
+    // 用户已登录且不存在重定向URL
+    // 验证TGC是否有效
+    request({
+      method: "POST",
+      url: "/auth/validateTgc",
+      withCredentials: true,
+    }).then((value) => {
+      if (value.code === 403) {
+        window.localStorage.removeItem("authorized");
+        router.push('/');
+      }
+    });
   }
+});
 </script>
 
 <style scoped lang="scss">
