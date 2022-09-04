@@ -62,7 +62,81 @@
             >
           </div>
           <div class="options px-3">
-            <router-link class="link" to="forgetPassword">已有账号，忘记密码？</router-link>
+            <router-link class="link" to="forgetPassword"
+              >已有账号，忘记密码？</router-link
+            >
+          </div>
+          <div class="others">
+            <div>其他登录方式</div>
+            <n-icon size="28" @click="loginByGithub" style="cursor: pointer">
+              <LogoGithub />
+            </n-icon>
+          </div>
+        </n-tab-pane>
+        <n-tab-pane name="loginByEmail" tab="邮箱登录">
+          <div class="formItems px-3">
+            <div class="formItem">
+              <n-input
+                placeholder="请输入Email"
+                v-model:value="loginByEmailForm.email"
+                :status="loginByEmailFormValidate.email ? 'error' : ''"
+                :on-input="
+                  () => {
+                    loginByEmailFormValidate.email = false;
+                  }
+                "
+                :maxlength="64"
+              >
+                <template v-slot:prefix>
+                  <n-icon color="#333639">
+                    <MailOutline />
+                  </n-icon>
+                </template>
+              </n-input>
+            </div>
+            <div class="formItem">
+              <n-input
+                placeholder="请输入验证码"
+                v-model:value="loginByEmailForm.code"
+                :maxlength="6"
+                :status="loginByEmailFormValidate.code ? 'error' : ''"
+                :on-input="
+                  () => {
+                    loginByEmailFormValidate.code = false;
+                  }
+                "
+              >
+                <template v-slot:prefix>
+                  <n-icon color="#333639">
+                    <KeypadOutline />
+                  </n-icon>
+                </template>
+              </n-input>
+              <n-button
+                @click="getEmailCode"
+                :loading="getEmailBtnState.loading"
+                :disabled="getEmailBtnState.leftTime > 0"
+                >获取验证码{{
+                  getEmailBtnState.leftTime > 0
+                    ? ` (${getEmailBtnState.leftTime})`
+                    : ""
+                }}</n-button
+              >
+            </div>
+          </div>
+          <div class="px-3 mt-30">
+            <n-button
+              type="primary"
+              block
+              @click="submitLoginByEmailForm"
+              :loading="loginByEmailFormSubmitLoading"
+              >登 录</n-button
+            >
+          </div>
+          <div class="options px-3">
+            <router-link class="link" to="forgetPassword"
+              >已有账号，忘记密码？</router-link
+            >
           </div>
           <div class="others">
             <div>其他登录方式</div>
@@ -123,7 +197,9 @@
             >
           </div>
           <div class="options px-3">
-            <router-link class="link" to="forgetPassword">已有账号，忘记密码？</router-link>
+            <router-link class="link" to="forgetPassword"
+              >已有账号，忘记密码？</router-link
+            >
           </div>
           <div class="others">
             <div>其他登录方式</div>
@@ -144,6 +220,7 @@ import {
   LockClosedOutline,
   LogoGithub,
   PhonePortraitOutline,
+  MailOutline,
   KeypadOutline,
 } from "@vicons/ionicons5";
 import { ref } from "vue";
@@ -213,7 +290,7 @@ const submitLoginForm = async () => {
       throw new Error();
     }
     let redirect = window.localStorage.getItem("redirect");
-    const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge)
+    const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge);
     window.localStorage.setItem("authorized", expiryTime.toString()); // 设置已登录状态
     if (redirect !== null) {
       const uri = router.resolve({
@@ -238,6 +315,10 @@ const loginFormSubmitLoading = ref<boolean>(false);
 interface LoginByPhoneFormType {
   phone: string;
   code: string;
+}
+
+interface EmailResult {
+  maxAge: string;
 }
 
 const loginByPhoneForm = ref<LoginByPhoneFormType>({
@@ -295,6 +376,92 @@ const submitLoginByPhoneForm = () => {
 };
 
 const loginByPhoneFormSubmitLoading = ref<boolean>(false);
+
+// loginByEmail
+
+interface LoginByEmailFormType {
+  email: string;
+  code: string;
+}
+
+const loginByEmailForm = ref<LoginByEmailFormType>({
+  email: "",
+  code: "",
+});
+
+const loginByEmailFormValidate = ref({
+  email: false,
+  code: false,
+});
+
+const validateEmail = (email: string) =>
+  /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(email);
+
+const validateLoginByEmailForm = () => {
+  const { email, code } = loginByEmailForm.value;
+  if (email === "" || code === "") {
+    loginByEmailFormValidate.value.email = email === "";
+    loginByEmailFormValidate.value.code = code === "";
+    message.error("邮箱地址或验证码不能为空");
+    return false;
+  }
+  if (validateEmail(email) === false) {
+    loginByEmailFormValidate.value.email = true;
+    message.error("邮箱格式错误");
+    return false;
+  }
+  if (/^[0-9]{6}$/.test(code) === false) {
+    loginByEmailFormValidate.value.code = true;
+    message.error("验证码只能为6位数字");
+    return false;
+  }
+  return true;
+};
+
+const getEmailBtnState = reactive({
+  loading: false,
+  timer: 0,
+  leftTime: 0,
+});
+
+const getEmailCode = async () => {
+  const { email } = loginByEmailForm.value;
+  if (validateEmail(email) === false) {
+    loginByEmailFormValidate.value.email = true;
+    message.error("邮箱格式错误");
+    return;
+  }
+  getEmailBtnState.loading = true;
+  request<EmailResult>({
+    method: "POST",
+    url: "/auth/getCodeByEmail",
+    data: {
+      email,
+    },
+  }).then((val) => {
+    console.log(val.data);
+  })
+  getEmailBtnState.leftTime = 60;
+  getEmailBtnState.timer = setInterval(() => {
+    if (getEmailBtnState.leftTime > 0) {
+      getEmailBtnState.leftTime -= 1;
+    } else {
+      clearInterval(getEmailBtnState.timer);
+      getEmailBtnState.timer = 0;
+    }
+  }, 1000);
+  getEmailBtnState.loading = false;
+};
+
+const submitLoginByEmailForm = () => {
+  if (validateLoginByEmailForm()) {
+    loginByEmailFormSubmitLoading.value = true;
+    console.log("submitting");
+    console.log(loginByEmailForm.value);
+  }
+};
+
+const loginByEmailFormSubmitLoading = ref<boolean>(false);
 </script>
 
 <style scoped lang="scss">
