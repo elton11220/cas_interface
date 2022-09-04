@@ -184,7 +184,9 @@
                   </n-icon>
                 </template>
               </n-input>
-              <n-button @click="getMsgCode">获取验证码</n-button>
+              <n-button @click="getMsgCode" :disabled="true"
+                >获取验证码</n-button
+              >
             </div>
           </div>
           <div class="px-3 mt-30">
@@ -193,6 +195,7 @@
               block
               @click="submitLoginByPhoneForm"
               :loading="loginByPhoneFormSubmitLoading"
+              :disabled="true"
               >登 录</n-button
             >
           </div>
@@ -440,7 +443,7 @@ const getEmailCode = async () => {
     },
   }).then((val) => {
     console.log(val.data);
-  })
+  });
   getEmailBtnState.leftTime = 60;
   getEmailBtnState.timer = setInterval(() => {
     if (getEmailBtnState.leftTime > 0) {
