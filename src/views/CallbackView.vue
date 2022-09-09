@@ -51,14 +51,17 @@ onMounted(async () => {
     const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge)
     window.localStorage.setItem("authorized", expiryTime.toString()); // 设置已登录状态
     if (redirect !== null) {
-      const uri = router.resolve({
-        path: redirect,
-        query: {
-          tgc: tgcResult?.tgc,
+      // 向服务器请求签发ST
+      await request<string>({
+        method: "POST",
+        url: "/auth/getSt",
+        data: {
+          redirect,
         },
+      }).catch((err) => {
+        window.localStorage.removeItem("redirect");
+        router.replace('/403');
       });
-      window.localStorage.removeItem("redirect");
-      window.location.href = uri.fullPath.replace(/^\//, "");
     } else {
       router.push("/noRedirectUrl");
     }
