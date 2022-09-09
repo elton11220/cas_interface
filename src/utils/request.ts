@@ -20,12 +20,19 @@ interface ErrResult {
 
 axiosInstance.interceptors.response.use(
   (res) => {
+    if (res.headers.location) {
+      window.localStorage.removeItem("redirect");
+      window.location.replace(res.headers.location);
+    }
     const code = res.data.code;
     const message = res.data.msg;
     if (code === 200 || code === 201) {
       window.$message.success(message);
-    } else if (code === 400 || code === 403) {
+    } else if (code === 400) {
       window.$message.error(message);
+    } else if (code === 403) {
+      window.$message.error(res.data.msg);
+      return Promise.reject(new Error(res.data.msg))
     }
     return res;
   },
