@@ -15,7 +15,44 @@
 </template>
 
 <script setup lang="ts">
-  const message = useMessage();
+import { onMounted } from "vue";
+import request from "@/utils/request";
+import { useRouter } from "vue-router";
+
+const message = useMessage();
+window.$message = useMessage();
+const router = useRouter();
+
+onMounted(() => {
+  // 验证TGC是否有效
+  request({
+    method: "POST",
+    url: "/auth/validateTgc",
+    withCredentials: true,
+  })
+    .then(async () => {
+      let redirect = window.localStorage.getItem("redirect");
+      if (redirect !== null) {
+        // 向服务器请求签发ST
+        await request<string>({
+          method: "POST",
+          url: "/auth/getSt",
+          data: {
+            redirect,
+          },
+        }).catch(() => {
+          window.localStorage.removeItem("redirect");
+          router.replace("/403");
+        });
+      } else {
+        router.push("/noRedirectUrl");
+      }
+    })
+    .catch(() => {
+      window.localStorage.removeItem("authorized");
+      router.push("/");
+    });
+});
 </script>
 
 <style scoped lang="scss">
