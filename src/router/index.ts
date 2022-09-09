@@ -88,6 +88,11 @@ const routes: RouteRecordRaw[] = [
         next('/')
       }
     }
+  },
+  {
+    path: '/403',
+    name: '403',
+    component: () => import("../views/NoPermissionView.vue"),
   }
 ];
 
