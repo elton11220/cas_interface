@@ -93,6 +93,11 @@ const routes: RouteRecordRaw[] = [
     path: '/403',
     name: '403',
     component: () => import("../views/NoPermissionView.vue"),
+  },
+  {
+    path: '/400',
+    name: '400',
+    component: () => import("../views/BadRequestView.vue"),
   }
 ];
 
