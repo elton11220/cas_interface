@@ -18,6 +18,7 @@
 import { onMounted } from "vue";
 import request from "@/utils/request";
 import { useRouter } from "vue-router";
+import { RequestError, RequestErrorTypes } from "@/utils/RequestError";
 
 const message = useMessage();
 window.$message = useMessage();
@@ -38,11 +39,20 @@ onMounted(() => {
           method: "POST",
           url: "/auth/getSt",
           data: {
-            redirect,
+            target: redirect,
           },
-        }).catch(() => {
+        }).catch((e) => {
           window.localStorage.removeItem("redirect");
-          router.replace("/403");
+          if (e instanceof RequestError) {
+            const { errCode } = e;
+            if (errCode === RequestErrorTypes.BAD_REQUEST) {
+              router.replace(
+                `/400?redirect=${encodeURIComponent(redirect as string)}`
+              );
+            } else if (errCode === RequestErrorTypes.FORBIDDEN) {
+              router.replace("/403");
+            }
+          }
         });
       } else {
         router.push("/noRedirectUrl");

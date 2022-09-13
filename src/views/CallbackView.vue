@@ -18,6 +18,7 @@
 import request from "@/utils/request";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
+import { RequestError, RequestErrorTypes } from "@/utils/RequestError";
 
 const message = useMessage();
 window.$message = useMessage();
@@ -48,7 +49,7 @@ onMounted(async () => {
       throw new Error();
     }
     let redirect = window.localStorage.getItem("redirect");
-    const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge)
+    const expiryTime = new Date().getTime() + Number.parseInt(tgcResult.maxAge);
     window.localStorage.setItem("authorized", expiryTime.toString()); // 设置已登录状态
     if (redirect !== null) {
       // 向服务器请求签发ST
@@ -56,11 +57,20 @@ onMounted(async () => {
         method: "POST",
         url: "/auth/getSt",
         data: {
-          redirect,
+          target: redirect,
         },
-      }).catch((err) => {
+      }).catch((e) => {
         window.localStorage.removeItem("redirect");
-        router.replace('/403');
+        if (e instanceof RequestError) {
+          const { errCode } = e;
+          if (errCode === RequestErrorTypes.BAD_REQUEST) {
+            router.replace(
+              `/400?redirect=${encodeURIComponent(redirect as string)}`
+            );
+          } else if (errCode === RequestErrorTypes.FORBIDDEN) {
+            router.replace("/403");
+          }
+        }
       });
     } else {
       router.push("/noRedirectUrl");
