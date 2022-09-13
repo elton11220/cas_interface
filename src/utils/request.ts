@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import type { AxiosResponse, AxiosError } from "axios";
+import { RequestError } from "./RequestError";
 
 const axiosInstance = axios.create({
   baseURL: '/api',
@@ -30,9 +31,10 @@ axiosInstance.interceptors.response.use(
       window.$message.success(message);
     } else if (code === 400) {
       window.$message.error(message);
+      return Promise.reject(new RequestError(res.data.msg, 400))
     } else if (code === 403) {
       window.$message.error(res.data.msg);
-      return Promise.reject(new Error(res.data.msg))
+      return Promise.reject(new RequestError(res.data.msg, 403))
     }
     return res;
   },
