@@ -6,7 +6,11 @@
       description="总有些门是对你关闭的"
     >
       <template #footer>
-        <n-button type="primary" secondary @click="onBtnExitClicked"
+        <n-button
+          type="primary"
+          secondary
+          @click="onBtnExitClicked"
+          v-if="authorized"
           >退出登录</n-button
         >
       </template>
@@ -17,10 +21,15 @@
 <script setup lang="ts">
 import request from "@/utils/request";
 import { useRouter } from "vue-router";
+import { computed } from "vue";
 
 const router = useRouter();
 const message = useMessage();
 window.$message = useMessage();
+
+const authorized = computed(() => {
+  return window.localStorage.getItem("authorized") !== null;
+});
 
 const onBtnExitClicked = () => {
   request({

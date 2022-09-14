@@ -3,7 +3,11 @@
     <n-result status="500" title="400 请求失败" description="一切尽在不言中">
       <template #footer>
         <div class="flex items-center gap-10 justify-center">
-          <n-button type="primary" secondary @click="onBtnExitClicked"
+          <n-button
+            type="primary"
+            secondary
+            @click="onBtnExitClicked"
+            v-if="authorized"
             >退出登录</n-button
           >
           <n-button v-if="redirect" @click="onBtnReturnClicked" secondary
@@ -17,13 +21,17 @@
 
 <script setup lang="ts">
 import request from "@/utils/request";
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const redirect = ref<string>();
 const router = useRouter();
 const message = useMessage();
 window.$message = useMessage();
+
+const authorized = computed(() => {
+  return window.localStorage.getItem("authorized") !== null;
+});
 
 onBeforeMount(() => {
   if (window.history.state?.redirect) {

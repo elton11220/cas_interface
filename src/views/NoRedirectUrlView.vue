@@ -9,7 +9,11 @@
             description="但并不知道你要重定向到哪里"
           >
             <template #footer>
-              <n-button type="primary" secondary @click="onBtnExitClicked"
+              <n-button
+                type="primary"
+                secondary
+                @click="onBtnExitClicked"
+                v-if="authorized"
                 >退出登录</n-button
               >
             </template>
@@ -23,13 +27,17 @@
 <script setup lang="ts">
 import request from "@/utils/request";
 import { RequestError, RequestErrorTypes } from "@/utils/RequestError";
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 const message = useMessage();
 window.$message = useMessage();
+
+const authorized = computed(() => {
+  return window.localStorage.getItem("authorized") !== null;
+});
 
 const onBtnExitClicked = () => {
   request({
