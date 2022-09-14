@@ -5,9 +5,11 @@
       title="403 没有权限"
       description="总有些门是对你关闭的"
     >
-      <n-button type="primary" secondary @click="onBtnExitClicked"
-        >退出登录</n-button
-      >
+      <template #footer>
+        <n-button type="primary" secondary @click="onBtnExitClicked"
+          >退出登录</n-button
+        >
+      </template>
     </n-result>
   </div>
 </template>
