@@ -10,14 +10,12 @@
 
 <script setup lang="ts">
 import { ref, onBeforeMount } from "vue";
-import { useRoute } from "vue-router";
 
-const route = useRoute();
 const redirect = ref<string>();
 
 onBeforeMount(() => {
-  if (route.query?.redirect) {
-    redirect.value = route.query.redirect as string;
+  if (window.history.state?.redirect) {
+    redirect.value = window.history.state.redirect as string;
   }
 })
 

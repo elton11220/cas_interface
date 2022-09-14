@@ -64,9 +64,13 @@ onMounted(async () => {
         if (e instanceof RequestError) {
           const { errCode } = e;
           if (errCode === RequestErrorTypes.BAD_REQUEST) {
-            router.replace(
-              `/400?redirect=${encodeURIComponent(redirect as string)}`
-            );
+            router.push({
+              name: "400",
+              state: {
+                redirect,
+              },
+              replace: true,
+            });
           } else if (errCode === RequestErrorTypes.FORBIDDEN) {
             router.replace("/403");
           }
