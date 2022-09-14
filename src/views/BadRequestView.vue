@@ -22,6 +22,8 @@ import { useRouter } from "vue-router";
 
 const redirect = ref<string>();
 const router = useRouter();
+const message = useMessage();
+window.$message = useMessage();
 
 onBeforeMount(() => {
   if (window.history.state?.redirect) {

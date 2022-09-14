@@ -17,6 +17,8 @@ import request from "@/utils/request";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const message = useMessage();
+window.$message = useMessage();
 
 const onBtnExitClicked = () => {
   request({
