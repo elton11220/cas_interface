@@ -35,12 +35,20 @@ const onBtnExitClicked = () => {
   request({
     url: "/auth/logout",
     method: "POST",
-  }).then(() => {
-    window.localStorage.removeItem("authorized");
-    router.push({
-      path: "/",
+  })
+    .then(() => {
+      window.localStorage.removeItem("authorized");
+      router.push({
+        path: "/",
+      });
+    })
+    .catch(() => {
+      window.localStorage.removeItem("authorized");
+      message.warning("会话没有被正确关闭");
+      router.push({
+        path: "/",
+      });
     });
-  });
 };
 
 const onBtnReturnClicked = () => {
