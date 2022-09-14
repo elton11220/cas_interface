@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import CallbackView from "../views/CallbackView.vue";
 import RedirectView from "../views/RedirectView.vue";
+import LogoutView from "../views/LogoutView.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -98,6 +99,25 @@ const routes: RouteRecordRaw[] = [
     path: '/400',
     name: '400',
     component: () => import("../views/BadRequestView.vue"),
+  },
+  {
+    path: '/logout',
+    name: 'logout',
+    component: LogoutView,
+    beforeEnter: (to, from, next) => {
+      const expiryTime = window.localStorage.getItem("authorized");
+      if (
+        expiryTime !== null &&
+        Number(expiryTime).toString() !== "NaN" &&
+        new Date().getTime() < Number.parseInt(expiryTime) &&
+        to.query?.redirect
+      ) {
+        next()
+      } else {
+        // 用户直接访问本路径，不存在登录记录
+        next('/')
+      }
+    }
   }
 ];
 
