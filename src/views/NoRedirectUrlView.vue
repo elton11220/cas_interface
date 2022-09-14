@@ -9,7 +9,9 @@
             description="但并不知道你要重定向到哪里"
           >
             <template #footer>
-              <n-button @click="bonusClick">哦</n-button>
+              <n-button type="primary" secondary @click="onBtnExitClicked"
+                >退出登录</n-button
+              >
             </template>
           </n-result>
         </div>
@@ -28,11 +30,23 @@ const router = useRouter();
 
 const message = useMessage();
 window.$message = useMessage();
-const bonusClick = () => {
-  message.success("这是个彩蛋🍉");
-  message.warning("这是个彩蛋😋");
-  message.error("只是个彩蛋🍖");
-  message.info("真的只是个彩蛋🍟");
+
+const onBtnExitClicked = () => {
+  request({
+    url: "/auth/logout",
+    method: "POST",
+  })
+    .then(() => {
+      window.localStorage.removeItem("authorized");
+      router.push({
+        path: "/",
+      });
+    })
+    .catch(() => {
+      router.push({
+        name: "400",
+      });
+    });
 };
 
 onMounted(() => {
@@ -53,11 +67,11 @@ onMounted(() => {
       if (e instanceof RequestError) {
         if (e.errCode === RequestErrorTypes.FORBIDDEN) {
           window.localStorage.removeItem("authorized");
-          router.push('/');
+          router.push("/");
         }
       }
-      router.push('/400');
-    })
+      router.push("/400");
+    });
   }
 });
 </script>
@@ -116,6 +130,10 @@ onMounted(() => {
 
 .flex {
   display: flex;
+}
+
+.gap-10 {
+  gap: 10px;
 }
 
 .flex-col {
