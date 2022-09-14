@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import request from "@/utils/request";
+import { RequestError, RequestErrorTypes } from "@/utils/RequestError";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -48,12 +49,15 @@ onMounted(() => {
       method: "POST",
       url: "/auth/validateTgc",
       withCredentials: true,
-    }).then((value) => {
-      if (value.code === 403) {
-        window.localStorage.removeItem("authorized");
-        router.push('/');
+    }).catch((e) => {
+      if (e instanceof RequestError) {
+        if (e.errCode === RequestErrorTypes.FORBIDDEN) {
+          window.localStorage.removeItem("authorized");
+          router.push('/');
+        }
       }
-    });
+      router.push('/400');
+    })
   }
 });
 </script>
