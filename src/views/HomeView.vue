@@ -280,15 +280,21 @@ const validateLoginForm = () => {
 const submitLoginForm = async () => {
   if (validateLoginForm()) {
     loginFormSubmitLoading.value = true;
-    const { data: tgcResult } = await request<TgcResult>({
-      url: "/auth/getTgc",
-      method: "POST",
-      data: {
-        username: loginForm.value.username,
-        password: loginForm.value.password,
-      },
-      withCredentials: false,
-    });
+    let tgcResult = null;
+    try {
+      const { data } = await request<TgcResult>({
+        url: "/auth/getTgc",
+        method: "POST",
+        data: {
+          username: loginForm.value.username,
+          password: loginForm.value.password,
+        },
+        withCredentials: false,
+      });
+      tgcResult = data;
+    } catch {
+      loginFormSubmitLoading.value = false;
+    }
     if (tgcResult?.tgc == null) {
       loginFormSubmitLoading.value = false;
       throw new Error();
@@ -476,15 +482,21 @@ const getEmailCode = async () => {
 const submitLoginByEmailForm = async () => {
   if (validateLoginByEmailForm()) {
     loginByEmailFormSubmitLoading.value = true;
-    const { data: tgcResult } = await request<TgcResult>({
-      url: "/auth/getTgcByEmail",
-      method: "POST",
-      data: {
-        email: loginByEmailForm.value.email,
-        code: loginByEmailForm.value.code,
-      },
-      withCredentials: true,
-    });
+    let tgcResult = null;
+    try {
+      const { data } = await request<TgcResult>({
+        url: "/auth/getTgcByEmail",
+        method: "POST",
+        data: {
+          email: loginByEmailForm.value.email,
+          code: loginByEmailForm.value.code,
+        },
+        withCredentials: true,
+      });
+      tgcResult = data;
+    } catch {
+      loginByEmailFormSubmitLoading.value = false;
+    }
     if (tgcResult?.tgc == null) {
       loginByEmailFormSubmitLoading.value = false;
       throw new Error();
