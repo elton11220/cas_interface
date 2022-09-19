@@ -240,7 +240,7 @@ const router = useRouter();
 const loginByGithub = () => {
   const githubOptions = {
     clientId: "459ae6faf422ca9ac168",
-    redirectUri: "http://localhost:5173/callback",
+    redirectUri: "http://127.0.0.1:5173/callback",
   };
   window.location.href = `https://github.com/login/oauth/authorize?client_id=${githubOptions.clientId}&redirect_uri=${githubOptions.redirectUri}`;
 };
