@@ -464,8 +464,11 @@ const getEmailCode = async () => {
     data: {
       email,
     },
-  }).then((val) => {
-    console.log(val.data);
+  }).catch(() => {
+    clearInterval(getEmailBtnState.timer);
+    getEmailBtnState.timer = 0;
+    getEmailBtnState.leftTime = 0;
+    getEmailBtnState.loading = false;
   });
   getEmailBtnState.leftTime = 60;
   getEmailBtnState.timer = setInterval(() => {
